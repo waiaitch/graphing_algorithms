@@ -51,10 +51,47 @@ public class Graph {
 	 
 	 
 	 //Start of min Heap
-	 public int[] dij(Graphs G, int Source) {
-		 
-		 
-		 
+	 public static int[] dij(Graphs G, int source) {
+		 int vert = G.vertices;
+		 int d[] = new int[vert];
+		 int pi[] = new int[vert];
+		 int S[] = new int[vert];
+		 for(int x=0;x<vert;x++) {
+			 d[x] = 10000;
+			 pi[x] = -1;
+			 S[x] = 0;
+		 }
+		 d[source] = 0;
+		 int Q[] = new int[vert];
+		 for(int x=0;x<vert;x++) {
+			 Q[x] = x;
+		 }
+		 int empty = 0;
+		 while(empty!=vert) {
+			 int u = extractCheap(d,empty);
+			 S[u] = 1;
+			 LinkedList<Edge> list = G.adjacencylist[u];
+			 int numOfVertex = list.size();
+			 for(int v=0;v<numOfVertex;v++) {
+				 if(S[v]!=1 && d[v]>d[u]+list.get(v).weight) {
+					 Q[empty] = v;
+					 d[v] = d[u]+list.get(v).weight;
+					 pi[v] = u;
+				 }
+			 }
+			 empty++;
+		 }
+		 return Q; 
+	 }
+	 
+	 public static int extractCheap(int d[], int Q) {
+		 int min = 10001;
+		 for(int x=Q;x<d.length;x++) {
+			 if(d[x]<min) {
+				 min = d[x];
+			 }
+		 }
+		 return min;
 	 }
 	 
 	 
@@ -72,5 +109,7 @@ public class Graph {
 		 graph.addEdge(4, 1, 4);
 		 graph.addEdge(4, 5, 6);
 		 graph.printGraph();
+		 int[] P = new int[vertices];
+		 P = dij(graph,0);
 	 }
 }
