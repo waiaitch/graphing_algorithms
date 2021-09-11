@@ -46,6 +46,12 @@ public class Part_A {
             //find cheapest edge to a not already visited destination.
             //remove() operations with logE
             int edge = remove(Q);
+            //means source vertex is not connected to any other vertices
+            if(edge == -1) {
+            	System.out.println("Source not connected");
+            	setMaxToZero(shortestDistance);
+            	return shortestDistance;
+            }
             comp++;
             while (nodesVisited[edge] != 0) {
                 if (Q[Q.length-1]==0) {
@@ -64,10 +70,8 @@ public class Part_A {
             Q[edge] = -1;
             comp++;
         } while (Q[Q.length-1]!=0);
-
-        for(int x=0;x<pi.length;x++) {
-    		System.out.println("Vertex " + x + " is connected from" + pi[x]);
-    	}
+        
+        setMaxToZero(shortestDistance);
         return shortestDistance;
     }
     
@@ -127,12 +131,20 @@ public class Part_A {
 
             //find cheapest edge to a not already visited destination.
             //remove() operations with logE
-            Edge edge = edgeQueue.remove();
+            Edge edge;
+            if(edgeQueue.size() == 0) {
+            	System.out.println("Source not connected");
+            	setMaxToZero(shortestDistance);
+            	return shortestDistance;
+            }
+            else {
+            	edge = edgeQueue.remove();
+            }
             comp2++;
             while (nodesVisited[edge.destination] != 0) {
                 if (edgeQueue.isEmpty()) {
                 	for(int x=0;x<pi.length;x++) {
-                		System.out.println("Vertex " + x + " is connected from" + pi[x]);
+                		//System.out.println("Vertex " + x + " is connected from" + pi[x]);
                 	}
                     return shortestDistance;
                 }
@@ -145,20 +157,30 @@ public class Part_A {
             nodesVisited[edge.destination] = 1;
             comp2++;
         } while (!edgeQueue.isEmpty());
-
-        return nodesVisited;
+        
+        setMaxToZero(shortestDistance);
+        return shortestDistance;
     }
     //End
     
+    //Helper functions
     static GraphAdjacencyMatrix randomGraph(int vertex) {
     	int src, dest, weight;
-    	int edges = ThreadLocalRandom.current().nextInt(vertex, (vertex*(vertex-1)/2));
+    	int edges = ThreadLocalRandom.current().nextInt(1, (vertex*(vertex-1)/2));
     	//System.out.println("Random edges: " + edges);
 		graph = new GraphAdjacencyMatrix(vertex);
 		graph2 = new Graphs(vertex);
 		for (int i = 0; i < edges; i++) {
 			src = ThreadLocalRandom.current().nextInt(0, vertex);
 			dest = ThreadLocalRandom.current().nextInt(1,vertex);
+			do {
+				if(src != dest)
+					break;
+				else {
+					src = ThreadLocalRandom.current().nextInt(0, vertex);
+					dest = ThreadLocalRandom.current().nextInt(1,vertex);
+				}
+			} while(src != dest);
 			weight = ThreadLocalRandom.current().nextInt(0,10);
 			//System.out.println("Src: " + src + ",Dest: " + dest);
 			graph.addEdge(src, dest, weight);
@@ -167,6 +189,13 @@ public class Part_A {
 
 		return graph;
 	}
+    
+    static void setMaxToZero(int[] a) {
+    	for(int i = 0; i < a.length; i++) {
+        	if(a[i] == Integer.MAX_VALUE)
+        		a[i] = 0;
+        }
+    }
     
     // Main driver method
     public static void main(String arg[])
@@ -191,9 +220,13 @@ public class Part_A {
     		comp = 0;
     		comp2 = 0;
     		//play around with vertices value
-        	randomGraph(5);
+        	randomGraph(10);
+        	System.out.println();
         	
+        	graph.printGraph();
+        	System.out.println();
         	graph2.printGraph();
+        	System.out.println();
         	
         	double startTime = System.nanoTime();
         	int[] d = Dijkstras(graph.matrix, src);
@@ -211,6 +244,7 @@ public class Part_A {
         	for(int j = 0; j < d.length; j++) {
         		System.out.println(String.format("Shortest path from %s to %s is %s", src, j, d[j]));
         	}
+        	System.out.println();
         	for(int j = 0; j < d.length; j++) {
         		System.out.println(String.format("Shortest path from %s to %s is %s", src, j, d2[j]));
         	}
@@ -292,7 +326,7 @@ class GraphAdjacencyMatrix {
 			System.out.print("Vertex " + i + " is connected to: ");
 			for (int j = 0; j < vertex; j++) {
 				if (matrix[i][j] != 0) {
-					System.out.print(j + " ");
+					System.out.print(j + " with weight " + matrix[i][j] + ", ");
 				}
 			}
 			System.out.println();
@@ -302,3 +336,4 @@ class GraphAdjacencyMatrix {
 		System.out.println();
 	}
 }
+
