@@ -90,8 +90,9 @@ public class Part_A {
     	int sample = 10;
     	
     	for(int i = 0; i < sample; i++) {
+    		comp = 0;
     		//play around with vertices value
-        	GraphAdjacencyMatrix graph = randomGraph(200);
+        	GraphAdjacencyMatrix graph = randomGraph(10);
         	graph.printGraph();
         	
         	double startTime = System.nanoTime();
@@ -99,7 +100,6 @@ public class Part_A {
         	double stopTime = System.nanoTime();
         	avgTime += (stopTime - startTime)/1000000;
         	avgComp += comp;
-        	
         	
         	//System.out.println(Arrays.toString(Dijkstras(graph.matrix, src)));
         	
