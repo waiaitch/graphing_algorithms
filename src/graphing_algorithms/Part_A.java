@@ -1,17 +1,13 @@
 package graphing_algorithms;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Part_A {
 	
-    public static void printDijkstras(int [][] graph, int source) {
-        // Prints shortest distances to all nodes from the source.
-        System.out.println(Arrays.toString(Dijkstras(graph, source)));
-    }
+	public static int comp;
 
     public static int[] Dijkstras(int [][] graph, int source) {
-        // Ideally should check matrix's validity to be square and symmetric but haven't done here since its pretty straightforward.
-
         int [] nodesVisited = new int [graph.length];
         Queue<Edge> edgeQueue = new PriorityQueue<>();
         int [] shortestDistance = new int[graph.length];
@@ -19,9 +15,11 @@ public class Part_A {
 
         // Start with the source vertex.
         int currentNode = source;
-        shortestDistance[0] = 0;
-        nodesVisited[0] = 1;
-
+        shortestDistance[source] = 0;
+        nodesVisited[source] = 1;
+        
+        //adjacency matrix takes 
+        
         do {
             for (int col = 0; col<graph[currentNode].length; col++) {
                 // Take all edges from this node. Skip self & 0-weight edges
@@ -35,37 +33,77 @@ public class Part_A {
                 {
                     shortestDistance[col] = shortestDistance[currentNode] + graph[currentNode][col];
                 }
+                comp++;
             }
 
             //find cheapest edge to a not already visited destination.
+            //remove() operations with logE
             Edge edge = edgeQueue.remove();
-            while (nodesVisited[edge.destination] == 1) {
+            comp++;
+            while (nodesVisited[edge.destination] != 0) {
                 if (edgeQueue.isEmpty()) {
                     return shortestDistance;
                 }
                 edge = edgeQueue.remove();
+                comp++;
             }
 
             // Now that you've reached this edge as a destination, record it.
             currentNode = edge.destination;
             nodesVisited[edge.destination] = 1;
+            comp++;
         } while (!edgeQueue.isEmpty());
 
         return nodesVisited;
     }
     
+    static GraphAdjacencyMatrix randomGraph(int vertex) {
+    	int src, dest, weight;
+    	int edges = ThreadLocalRandom.current().nextInt(vertex, (vertex*(vertex-1)/2));
+    	//System.out.println("Random edges: " + edges);
+		GraphAdjacencyMatrix graph = new GraphAdjacencyMatrix(vertex);
+		for (int i = 0; i < edges; i++) {
+			src = ThreadLocalRandom.current().nextInt(0, vertex);
+			dest = ThreadLocalRandom.current().nextInt(0,vertex);
+			weight = ThreadLocalRandom.current().nextInt(0,10);
+			//System.out.println("Src: " + src + ",Dest: " + dest);
+			graph.addEdge(src, dest, weight);
+		}
+
+		return graph;
+	}
+    
     // Main driver method
     public static void main(String arg[])
     {
-    	GraphAdjacencyMatrix graph = new GraphAdjacencyMatrix(5);
-    	graph.addEdge(0,1,9);
-    	graph.addEdge(0,2,6);
-    	graph.addEdge(0,3,5);
-    	graph.addEdge(0,4,3);
-    	graph.addEdge(2,1,2);
-    	graph.addEdge(2,3,4);
+//    	GraphAdjacencyMatrix graph = new GraphAdjacencyMatrix(5);
+//    	graph.addEdge(0,1,9);
+//    	graph.addEdge(0,2,6);
+//    	graph.addEdge(0,3,5);
+//    	graph.addEdge(0,4,3);
+//    	graph.addEdge(2,1,2);
+//    	graph.addEdge(2,3,4);
     	
-    	printDijkstras(graph.matrix, 0);
+    	int src = 0;
+    	double totalTime;
+    	
+    	//play around with vertices value
+    	GraphAdjacencyMatrix graph = randomGraph(200);
+    	graph.printGraph();
+    	
+    	double startTime = System.nanoTime();
+    	int[] d = Dijkstras(graph.matrix, src);
+    	double stopTime = System.nanoTime();
+    	totalTime = (stopTime - startTime)/1000000;
+    	
+    	
+    	//System.out.println(Arrays.toString(Dijkstras(graph.matrix, src)));
+    	
+    	for(int i = 0; i < d.length; i++) {
+    		System.out.println(String.format("Shortest path from %s to %s is %s", src, i, d[i]));
+    	}
+    	System.out.println("Comparisons: " + comp);
+    	System.out.println("Computational time taken: " + totalTime + "ms");
     }
 }
 
@@ -112,6 +150,7 @@ class Edge implements Comparable<Edge> {
 class GraphAdjacencyMatrix {
 	int vertex;
 	int matrix[][];
+	int edge;
 
 	public GraphAdjacencyMatrix(int vertex) {
 		this.vertex = vertex;
@@ -124,6 +163,7 @@ class GraphAdjacencyMatrix {
 
 		// add back edge for undirected graph
 		matrix[destination][source] = weight;
+		edge++;
 	}
 
 	public void printGraph() {
@@ -135,13 +175,16 @@ class GraphAdjacencyMatrix {
 			System.out.println();
 		}
 		for (int i = 0; i < vertex; i++) {
-			System.out.print("Vertex " + i + " is connected to:");
+			System.out.print("Vertex " + i + " is connected to: ");
 			for (int j = 0; j < vertex; j++) {
-				if (matrix[i][j] == 1) {
+				if (matrix[i][j] != 0) {
 					System.out.print(j + " ");
 				}
 			}
 			System.out.println();
 		}
+		
+		System.out.println("Edges: " + edge);
+		System.out.println();
 	}
 }
