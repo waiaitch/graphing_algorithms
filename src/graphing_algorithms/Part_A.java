@@ -85,25 +85,32 @@ public class Part_A {
 //    	graph.addEdge(2,3,4);
     	
     	int src = 0;
-    	double totalTime;
+    	double avgTime = 0;
+    	int avgComp = 0;
+    	int sample = 10;
     	
-    	//play around with vertices value
-    	GraphAdjacencyMatrix graph = randomGraph(200);
-    	graph.printGraph();
-    	
-    	double startTime = System.nanoTime();
-    	int[] d = Dijkstras(graph.matrix, src);
-    	double stopTime = System.nanoTime();
-    	totalTime = (stopTime - startTime)/1000000;
-    	
-    	
-    	//System.out.println(Arrays.toString(Dijkstras(graph.matrix, src)));
-    	
-    	for(int i = 0; i < d.length; i++) {
-    		System.out.println(String.format("Shortest path from %s to %s is %s", src, i, d[i]));
+    	for(int i = 0; i < sample; i++) {
+    		//play around with vertices value
+        	GraphAdjacencyMatrix graph = randomGraph(200);
+        	graph.printGraph();
+        	
+        	double startTime = System.nanoTime();
+        	int[] d = Dijkstras(graph.matrix, src);
+        	double stopTime = System.nanoTime();
+        	avgTime += (stopTime - startTime)/1000000;
+        	avgComp += comp;
+        	
+        	
+        	//System.out.println(Arrays.toString(Dijkstras(graph.matrix, src)));
+        	
+        	for(int j = 0; j < d.length; j++) {
+        		System.out.println(String.format("Shortest path from %s to %s is %s", src, j, d[j]));
+        	}
     	}
-    	System.out.println("Comparisons: " + comp);
-    	System.out.println("Computational time taken: " + totalTime + "ms");
+    	
+    	
+    	System.out.println("Average comparisons: " + avgComp/sample);
+    	System.out.println("Average computational time taken: " + avgTime/sample + "ms");
     }
 }
 
