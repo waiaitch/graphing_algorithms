@@ -146,6 +146,7 @@ public class Part_A {
                 	for(int x=0;x<pi.length;x++) {
                 		//System.out.println("Vertex " + x + " is connected from" + pi[x]);
                 	}
+                	//setMaxToZero(shortestDistance);
                     return shortestDistance;
                 }
                 edge = edgeQueue.remove();
@@ -167,24 +168,30 @@ public class Part_A {
     static GraphAdjacencyMatrix randomGraph(int vertex) {
     	int src, dest, weight;
     	int edges = ThreadLocalRandom.current().nextInt(1, (vertex*(vertex-1)/2));
-    	//System.out.println("Random edges: " + edges);
+    	boolean add;
 		graph = new GraphAdjacencyMatrix(vertex);
 		graph2 = new Graphs(vertex);
 		for (int i = 0; i < edges; i++) {
+			add = true;
 			src = ThreadLocalRandom.current().nextInt(0, vertex);
 			dest = ThreadLocalRandom.current().nextInt(1,vertex);
 			do {
-				if(src != dest)
+				if(src != dest) {
 					break;
+				}
 				else {
 					src = ThreadLocalRandom.current().nextInt(0, vertex);
 					dest = ThreadLocalRandom.current().nextInt(1,vertex);
 				}
 			} while(src != dest);
 			weight = ThreadLocalRandom.current().nextInt(0,10);
-			//System.out.println("Src: " + src + ",Dest: " + dest);
-			graph.addEdge(src, dest, weight);
-			graph2.addEdge(src, dest, weight);
+			if(graph.matrix[src][dest] != 0)
+				add = false;
+			if(add) {
+				graph.addEdge(src, dest, weight);
+				graph2.addEdge(src, dest, weight);
+			}
+			
 		}
 
 		return graph;
@@ -220,7 +227,7 @@ public class Part_A {
     		comp = 0;
     		comp2 = 0;
     		//play around with vertices value
-        	randomGraph(10);
+        	randomGraph(1000);
         	System.out.println();
         	
         	graph.printGraph();
